@@ -1,99 +1,66 @@
 package com.example.loja_games.controller;
 
+import javax.validation.Valid;
+
 import com.example.loja_games.model.Produto;
-import com.example.loja_games.model.Usuario;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.annotations.UpdateTimestamp;
-
+import com.example.loja_games.repository.CategoriaRepository;
+import com.example.loja_games.repository.ProdutoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
-
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/produtos")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ProdutoController {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Autowired
+    private ProdutoRepository produtoRepository;
 
-    @NotBlank(message = "O atributo título é Obrigatório!")
-    @Size(min = 5, max = 100, message = "O atributo título deve conter no mínimo 05 e no máximo 100 caracteres")
-    private String titulo;
+    @Autowired
+    private CategoriaRepository categoriaRepository;
 
-    @NotBlank(message = "O atributo texto é Obrigatório!")
-    @Size(min = 10, max = 1000, message = "O atributo texto deve conter no mínimo 10 e no máximo 1000 caracteres")
-    private String texto;
 
-    @UpdateTimestamp
-    private LocalDateTime data;
-
-    @ManyToOne
-    @JsonIgnoreProperties("produto")
-    private Produto produto;
-
-    @ManyToOne
-    @JsonIgnoreProperties("produto")
-    private Usuario usuario;
-
-    public Long getId() {
-        return this.id;
+    @GetMapping
+    public ResponseEntity<List<Produto>> getAll (){
+        return ResponseEntity.ok(produtoRepository.findAll());
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Produto getProduto() {
-        return produto;
-    }
-
-    public void setProduto(Produto produto) {
-        this.produto = produto;
-    }
-
-    public String getTitulo() {
-        return this.titulo;
-    }
-
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
-    }
-
-    public String getTexto() {
-        return this.texto;
-    }
-
-    public void setTexto(String texto) {
-        this.texto = texto;
-    }
-
-    public LocalDateTime getData() {
-        return this.data;
-    }
-
-    public void setData(LocalDateTime data) {
-        this.data = data;
+    @GetMapping("/{id}")
+    public ResponseEntity<Produto> getById(@PathVariable Long id) {
+        return produtoRepository.findById(id)
+                .map(resposta -> ResponseEntity.ok(resposta))
+                .orElse(ResponseEntity.notFound().build());
     }
 
 
-    public Usuario getUsuario() {
-        return this.usuario;
+    @PostMapping
+    public ResponseEntity<Produto> postPostagem(@Valid @RequestBody Produto produto){
+        return ResponseEntity.status(HttpStatus.CREATED).body(produtoRepository.save(produto));
     }
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
+    @PutMapping
+    public ResponseEntity<Produto> putPostagem (@Valid @RequestBody Produto produto){
+        return produtoRepository.findById((produto.getId()))
+                .map(resposta -> ResponseEntity.status(HttpStatus.OK)
+                        .body(produtoRepository.save(produto)))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable long id) {
+        Optional<Produto> produtos = produtoRepository.findById(id);
+
+        if(produtos.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        produtoRepository.deleteById(id);
+    }
+
 
 }
-
-
