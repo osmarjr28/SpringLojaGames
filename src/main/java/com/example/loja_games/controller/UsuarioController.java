@@ -49,7 +49,7 @@ public class UsuarioController {
     //@ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Este usuário já este no sistema")
     @PostMapping("/cadastrar")
     public ResponseEntity<Usuario> postUsuario(@Valid @RequestBody Usuario usuario, Model model) {
-        Optional<Usuario> usr = usuarioRepository.findByUsuario(usuario.getUsuario());
+        Optional<Usuario> usr = usuarioRepository.findByUsuarioContainingIgnoreCase(usuario.getUsuario());
         if (usr != null) {
             model.addAttribute("loginExiste", "Login já existe cadastrado");
         }

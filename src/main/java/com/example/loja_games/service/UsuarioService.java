@@ -21,7 +21,7 @@ public class UsuarioService {
 
     public Optional<Usuario> cadastrarUsuario(Usuario usuario) {
 
-        if (usuarioRepository.findByUsuario(usuario.getUsuario()).isPresent())
+        if (usuarioRepository.findByUsuarioContainingIgnoreCase(usuario.getUsuario()).isPresent())
             return Optional.empty();
 
         usuario.setSenha(criptografarSenha(usuario.getSenha()));
@@ -34,7 +34,7 @@ public class UsuarioService {
 
         if(usuarioRepository.findById(usuario.getId()).isPresent()) {
 
-            Optional<Usuario> buscaUsuario = usuarioRepository.findByUsuario(usuario.getUsuario());
+            Optional<Usuario> buscaUsuario = usuarioRepository.findByUsuarioContainingIgnoreCase(usuario.getUsuario());
 
             if ( (buscaUsuario.isPresent()) && ( buscaUsuario.get().getId() != usuario.getId()))
                 throw new ResponseStatusException(
@@ -52,7 +52,7 @@ public class UsuarioService {
 
     public Optional<UsuarioLogin> autenticarUsuario(Optional<UsuarioLogin> usuarioLogin) {
 
-        Optional<Usuario> usuario = usuarioRepository.findByUsuario(usuarioLogin.get().getUsuario());
+        Optional<Usuario> usuario = usuarioRepository.findByUsuarioContainingIgnoreCase(usuarioLogin.get().getUsuario());
 
         if (usuario.isPresent()) {
 
