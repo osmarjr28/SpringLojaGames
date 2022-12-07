@@ -1,5 +1,7 @@
 package com.example.loja_games.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -26,6 +28,29 @@ public class Produto  {
     @NotNull(message = "O atributo Descrição é obrigatório e não pode conter espaços em branco")
     private BigDecimal preco;
 
+    public Categoria getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    @ManyToOne
+    @JsonIgnoreProperties("produtos")
+    private Categoria categoria;
+
+    @ManyToOne
+    @JsonIgnoreProperties("produtos")
+    private Usuario usuario;
     public Long getId() {
         return id;
     }

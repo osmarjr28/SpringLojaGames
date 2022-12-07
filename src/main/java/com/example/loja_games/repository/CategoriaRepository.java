@@ -9,5 +9,7 @@ import java.util.List;
 
 @Repository
 public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
-    public List<Categoria> findAllByTipoContainingIgnoreCase(@Param("tipo") String tipo);
+
+    public List<Categoria>findAllByTipoContainingIgnoreCase(@Param("tipo") String tipo);
+
 }
